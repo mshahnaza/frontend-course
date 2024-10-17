@@ -1,0 +1,26 @@
+async function fetchUsersWithPosts() {
+    try {
+        const usersResponse = await fetch('https://jsonplaceholder.typicode.com/users');
+        const users = await usersResponse.json();
+
+        const usersWithPosts = await Promise.all(users.map(async (user) => {
+            const postsResponse = await fetch(`https://jsonplaceholder.typicode.com/posts?userId=${user.id}`);
+            const posts = await postsResponse.json();
+            
+            const postTitles = posts.map(post => post.title);
+
+            return {
+                id: user.id,
+                name: user.name,
+                posts: postTitles
+            };
+        }));
+
+        return usersWithPosts;
+    } catch (error) {
+        return Promise.reject('Failed to fetch users or posts');
+    }
+}
+fetchUsersWithPosts()
+  .then(data => console.log(data))
+  .catch(err => console.error(err));
